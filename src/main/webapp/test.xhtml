@@ -1,34 +1,58 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:h="http://xmlns.jcp.org/jsf/html"
-	xmlns:f="http://xmlns.jcp.org/jsf/core"
-	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
-	xmlns:jsf="http://xmlns.jcp.org/jsf"
-	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-	xmlns:p="http://primefaces.org/ui">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+      xmlns:jsf="http://xmlns.jcp.org/jsf" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+<h:head>
+    <title>PrimeFaces Issue</title>
+    <h:outputScript name="test.js" />
+    <h:outputStylesheet name="test.css" />
+</h:head>
+<h:body>
 
-    <h:head>
-        <title>PrimeFaces Test</title>
-        <h:outputScript name="test.js" />
-        <h:outputStylesheet name="test.css" />
-    </h:head>
-    <h:body>
+    <h1>Select issue using dialog and overlayPanel</h1>
+    <p:commandButton value="Open Wizard"
+                     oncomplete="PF('dialogWidget').show()"
+                     process="@this"
+                     style="width:98%;overflow:hidden;"/>
 
-        <h1>#{testView.string}</h1>
+    <p:dialog dynamic="true"
+              modal="true"
+              position="top"
+              widgetVar="dialogWidget">
         <h:form id="frmTest">
-            <p:dataTable id="tblJpa" widgetVar="jpaTable" var="row" value="#{testView.lazyDataModel}" rows="5">
+            <p:dataTable var="row"
+                         value="#{testView.testJpaList}"
+                         rows="4"
+                         scrollHeight="200">
                 <p:column field="id" />
                 <p:column field="stringCol" />
                 <p:column field="numberCol" />
-                <p:column field="decimalCol" />
-                <p:column field="dateCol" >
-                    <f:facet name="filter">
-                        <p:datePicker onchange="PF('jpaTable').filter()" />
-                    </f:facet>
+                <p:column field="child.stringCol">
+                    <p:commandButton id="testButton"
+                                     value="#{testView.selectedRow}"
+                                     update="@([id$=tblJpa])"
+                                     oncomplete="PF('overlayPanelWidget').show('#{component.clientId}')"
+                                     process="@this"
+                                     style="width:98%;overflow:hidden;">
+                    </p:commandButton>
                 </p:column>
-                <p:column field="child.stringCol" />
             </p:dataTable>
+            <p:overlayPanel id="overlayPanel"
+                            widgetVar="overlayPanelWidget"
+                            hideEvent="keyup"
+                            showCloseIcon="true"
+                            dismissable="true"
+                            dynamic="true"
+                            style="width: 60%">
+                <p:dataTable id="tblJpa" widgetVar="jpaTable" var="row" value="#{testView.testJpaList}" rows="4"
+                             scrollHeight="200" scrollRows="4" selectionMode="single" rowKey="#{row.id}" selection="#{testView.selectedRow}">
+                    <p:ajax event="rowSelect" update="@([id$=testButton])" oncomplete="PF('overlayPanelWidget').hide()" process="@this"/>
+                    <p:column field="id"/>
+                    <p:column field="stringCol"/>
+                </p:dataTable>
+            </p:overlayPanel>
         </h:form>
-
-    </h:body>
+    </p:dialog>
+</h:body>
 </html>

@@ -1,6 +1,10 @@
 package org.primefaces.test;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.faces.view.ViewScoped;
@@ -22,17 +26,31 @@ public class TestView implements Serializable {
 
     @Inject
     private EntityManager em;
-    private LazyDataModel<TestJpa> lazyDataModel;
+
+    public List<TestJpa> getTestJpaList() {
+        return testJpaList;
+    }
+
+    private List<TestJpa> testJpaList = new ArrayList<TestJpa>();
+
+    public TestJpa getSelectedRow() {
+        return selectedRow;
+    }
+
+    public void setSelectedRow(TestJpa selectedRow) {
+        this.selectedRow = selectedRow;
+    }
+
+    private TestJpa selectedRow;
+
 
     @PostConstruct
     public void init() {
-        string = "Welcome to PrimeFaces!!!";
-
-        lazyDataModel = new JpaLazyDataModel<>(TestJpa.class, () -> em);
+        testJpaList.add(TestJpa.builder().id(1l).stringCol("New York").numberCol(123l).decimalCol(BigDecimal.valueOf(123.45))
+                .dateCol(new Date()).build());
+        testJpaList.add(TestJpa.builder().id(2l).stringCol("Los Angeles").numberCol(124l).decimalCol(BigDecimal.valueOf(123.45))
+                .dateCol(new Date()).build());
+        testJpaList.add(TestJpa.builder().id(3l).stringCol("Hässleholm").numberCol(125l).decimalCol(BigDecimal.valueOf(123.45))
+                .dateCol(new Date()).build());
     }
-
-    public LazyDataModel<TestJpa> getLazyDataModel() {
-        return lazyDataModel;
-    }
-
 }
